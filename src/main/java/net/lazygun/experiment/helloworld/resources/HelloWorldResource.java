@@ -1,0 +1,39 @@
+package net.lazygun.experiment.helloworld.resources;
+
+import com.codahale.metrics.annotation.Timed;
+import net.lazygun.experiment.helloworld.core.Saying;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * TODO: Write Javadocs for this class.
+ * Created: 18/06/2015 23:06
+ *
+ * @author Ewan
+ */
+@Path("/hello-world")
+@Produces(MediaType.APPLICATION_JSON)
+public class HelloWorldResource {
+    private final String template;
+    private final String defaultName;
+    private final AtomicLong counter;
+
+    public HelloWorldResource(String template, String defaultName) {
+        this.template = template;
+        this.defaultName = defaultName;
+        this.counter = new AtomicLong();
+    }
+
+    @GET
+    @Timed
+    public Saying sayHello(@QueryParam("name") Optional<String> name) {
+        final String value = String.format(template, name.orElse(defaultName));
+        return new Saying(counter.incrementAndGet(), value);
+    }
+}
